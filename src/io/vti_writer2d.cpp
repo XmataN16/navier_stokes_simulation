@@ -11,7 +11,8 @@ namespace {
 
 void validate_state_shape(
     const UniformGrid2D& grid,
-    const FlowState2D& state) {
+    const FlowState2D& state
+) {
 
     const auto nx =
         grid.nx_cells();
@@ -38,6 +39,7 @@ void validate_state_shape(
         v.nx() != nx ||
         v.ny() != ny + 1
     ) {
+
         throw std::invalid_argument{
             "FlowState2D dimensions do not "
             "match UniformGrid2D"
@@ -61,10 +63,14 @@ void VtiWriter2D::write(
         state
     );
 
-    if (file_path.has_parent_path()) {
-        std::filesystem::create_directories(
-            file_path.parent_path()
-        );
+    if (
+        file_path.has_parent_path()
+    ) {
+
+        std::filesystem::
+            create_directories(
+                file_path.parent_path()
+            );
     }
 
     std::ofstream output{
@@ -72,6 +78,7 @@ void VtiWriter2D::write(
     };
 
     if (!output) {
+
         throw std::runtime_error{
             "Failed to open VTI output file: "
             + file_path.string()
@@ -102,6 +109,7 @@ void VtiWriter2D::write(
         << "byte_order=\"LittleEndian\">\n"
 
         << "  <ImageData "
+
         << "WholeExtent=\"0 "
         << x_max
         << " 0 "
@@ -109,9 +117,11 @@ void VtiWriter2D::write(
         << " 0 0\" "
 
         << "Origin=\""
-        << Real{0.5} * grid.dx()
+        << Real{0.5} *
+            grid.dx()
         << ' '
-        << Real{0.5} * grid.dy()
+        << Real{0.5} *
+            grid.dy()
         << " 0\" "
 
         << "Spacing=\""
@@ -119,6 +129,33 @@ void VtiWriter2D::write(
         << ' '
         << grid.dy()
         << " 1\">\n"
+
+        /*
+         * Simulation metadata.
+         */
+        << "    <FieldData>\n"
+
+        << "      <DataArray "
+        << "type=\"Float64\" "
+        << "Name=\"TimeValue\" "
+        << "NumberOfTuples=\"1\" "
+        << "format=\"ascii\">"
+
+        << state.time()
+
+        << "</DataArray>\n"
+
+        << "      <DataArray "
+        << "type=\"UInt64\" "
+        << "Name=\"Step\" "
+        << "NumberOfTuples=\"1\" "
+        << "format=\"ascii\">"
+
+        << state.step()
+
+        << "</DataArray>\n"
+
+        << "    </FieldData>\n"
 
         << "    <Piece Extent=\"0 "
         << x_max
@@ -131,7 +168,7 @@ void VtiWriter2D::write(
         << "Vectors=\"velocity\">\n";
 
     /*
-     * Pressure
+     * Pressure.
      */
     output
         << "        <DataArray "
@@ -148,29 +185,33 @@ void VtiWriter2D::write(
         j < ny;
         ++j
     ) {
-        output << "          ";
+
+        output
+            << "          ";
 
         for (
             std::size_t i = 0;
             i < nx;
             ++i
         ) {
+
             output
                 << pressure(i, j)
                 << ' ';
         }
 
-        output << '\n';
+        output
+            << '\n';
     }
 
     output
         << "        </DataArray>\n";
 
     /*
-     * Velocity
+     * Velocity.
      *
-     * MAC velocity is converted
-     * to cell centers for visualization.
+     * MAC face velocities are averaged
+     * into cell centers for ParaView.
      */
     output
         << "        <DataArray "
@@ -190,13 +231,16 @@ void VtiWriter2D::write(
         j < ny;
         ++j
     ) {
-        output << "          ";
+
+        output
+            << "          ";
 
         for (
             std::size_t i = 0;
             i < nx;
             ++i
         ) {
+
             const Real u_center =
                 Real{0.5} *
                 (
@@ -218,17 +262,21 @@ void VtiWriter2D::write(
                 << " 0 ";
         }
 
-        output << '\n';
+        output
+            << '\n';
     }
 
     output
         << "        </DataArray>\n"
 
         << "      </PointData>\n"
+
         << "      <CellData/>\n"
 
         << "    </Piece>\n"
+
         << "  </ImageData>\n"
+
         << "</VTKFile>\n";
 }
 

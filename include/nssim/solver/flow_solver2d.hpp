@@ -15,6 +15,7 @@ struct StepDiagnostics final {
 
     Real pressure_residual_l2{};
     Real divergence_l2{};
+    Real cfl{};
 
     bool pressure_converged{};
 };

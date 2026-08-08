@@ -6,6 +6,7 @@ namespace nssim {
 
 enum class BoundaryKind {
     no_slip_wall,
+    moving_wall,
     free_slip_wall,
     velocity_inlet,
     pressure_outlet,
@@ -28,23 +29,33 @@ struct BoundaryCondition2D final {
 
     [[nodiscard]]
     static constexpr
+    BoundaryCondition2D moving_wall(
+        const Vec2 value
+    ) noexcept {
+
+        return {
+            .kind = BoundaryKind::moving_wall,
+            .velocity = value
+        };
+    }
+
+    [[nodiscard]]
+    static constexpr
     BoundaryCondition2D free_slip() noexcept {
 
         return {
-            .kind =
-                BoundaryKind::free_slip_wall
+            .kind = BoundaryKind::free_slip_wall
         };
     }
 
     [[nodiscard]]
     static constexpr
     BoundaryCondition2D velocity_inlet(
-        const Vec2 value) noexcept {
+        const Vec2 value
+    ) noexcept {
 
         return {
-            .kind =
-                BoundaryKind::velocity_inlet,
-
+            .kind = BoundaryKind::velocity_inlet,
             .velocity = value
         };
     }
@@ -52,12 +63,11 @@ struct BoundaryCondition2D final {
     [[nodiscard]]
     static constexpr
     BoundaryCondition2D pressure_outlet(
-        const Real value) noexcept {
+        const Real value
+    ) noexcept {
 
         return {
-            .kind =
-                BoundaryKind::pressure_outlet,
-
+            .kind = BoundaryKind::pressure_outlet,
             .pressure = value
         };
     }
@@ -67,8 +77,7 @@ struct BoundaryCondition2D final {
     BoundaryCondition2D periodic() noexcept {
 
         return {
-            .kind =
-                BoundaryKind::periodic
+            .kind = BoundaryKind::periodic
         };
     }
 };
