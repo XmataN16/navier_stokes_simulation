@@ -1,0 +1,22 @@
+/build/
+/output/
+
+CMakeUserPresets.json
+compile_commands.json
+
+# IDE
+.vscode/settings.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Binaries / objects
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
