@@ -10,6 +10,7 @@ namespace nssim {
 enum class PressureSolverKind {
     jacobi,
     weighted_jacobi,
+    spectral_dct,
     conjugate_gradient,
     multigrid
 };
@@ -33,7 +34,15 @@ struct PressureSolverConfig final {
 
     void validate() const {
 
-        if (max_iterations == 0) {
+        /*
+         * Spectral DCT is a direct solver,
+         * therefore max_iterations does not
+         * apply to it.
+         */
+        if (
+            kind != PressureSolverKind::spectral_dct &&
+            max_iterations == 0
+        ) {
             throw std::invalid_argument{
                 "Pressure solver max_iterations "
                 "must be greater than zero"

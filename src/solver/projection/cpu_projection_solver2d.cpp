@@ -1,6 +1,7 @@
 #include "nssim/solver/projection/cpu_projection_solver2d.hpp"
 
 #include "nssim/solver/pressure/jacobi_pressure_solver2d.hpp"
+#include "nssim/solver/pressure/spectral_pressure_solver2d.hpp"
 
 #include <algorithm>
 #include <cmath>
@@ -687,31 +688,40 @@ CpuProjectionSolver2D(
 
     config_.validate();
 
-    switch (
-        config_.pressure.kind
-    ) {
+switch (
+    config_.pressure.kind
+) {
 
-    case PressureSolverKind::jacobi:
-    case PressureSolverKind::weighted_jacobi:
+case PressureSolverKind::jacobi:
+case PressureSolverKind::weighted_jacobi:
 
-        pressure_solver_ =
-            std::make_unique<
-                JacobiPressureSolver2D
-            >();
+    pressure_solver_ =
+        std::make_unique<
+            JacobiPressureSolver2D
+        >();
 
-        break;
+    break;
 
-    case PressureSolverKind::
-        conjugate_gradient:
+case PressureSolverKind::spectral_dct:
 
-    case PressureSolverKind::
-        multigrid:
+    pressure_solver_ =
+        std::make_unique<
+            SpectralPressureSolver2D
+        >();
 
-        throw std::invalid_argument{
-            "Selected pressure solver "
-            "is not implemented yet"
-        };
-    }
+    break;
+
+case PressureSolverKind::
+    conjugate_gradient:
+
+case PressureSolverKind::
+    multigrid:
+
+    throw std::invalid_argument{
+        "Selected pressure solver "
+        "is not implemented yet"
+    };
+}
 }
 
 std::string_view
